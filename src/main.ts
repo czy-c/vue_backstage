@@ -2,5 +2,23 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
+import { getCookie } from "@/utils/cookie";
+router.beforeEach((to, from, next) => {
+    const token =getCookie("token")||""
+    if (token&&store.state.isLogin) {
+        if(to.path=='/'){
+            next('/main');
+        }else{
+            next()
+        }
+    } else {
+        if(to.path=='/'||to.path=='/Register')next()
+        else{
+            next({path:"/"});
+        }
+    }
+  });
 
-createApp(App).use(store).use(router).mount('#app')
+createApp(App).use(ElementPlus).use(store).use(router).mount('#app')
