@@ -11,13 +11,14 @@
     <el-button type="danger" @click="loginOut">Login Out</el-button>
   </div>
 </template>
-<script>
+<script lang="ts">
 import { clearCookie, getCookie } from "@/utils/cookie";
 import router from "@/router";
 import EElMessage from "@/utils/EElMessage";
 import { useStore } from "vuex";
-export default {
-  setup() {
+import { defineComponent } from "vue";
+export default defineComponent({
+  setup(props,ctx) {
     const userInfo = useStore().state.userInfo;
     const loginOut = () => {
       clearCookie("token");
@@ -27,7 +28,7 @@ export default {
     };
     return { loginOut, userInfo };
   },
-};
+});
 </script>
 <style lang="less">
 .main {
