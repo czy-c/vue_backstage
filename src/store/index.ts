@@ -1,5 +1,3 @@
-import { login } from '@/api/user'
-import { getCookie, setCookie } from '@/utils/cookie'
 import { createStore } from 'vuex'
 import VuexPersistence from 'vuex-persist'
 
@@ -12,7 +10,8 @@ export default createStore({
     userInfo:{
       name:'',
       phone:'',
-      account:''
+      account:'',
+      id:''
     }
   },
   getters: {
@@ -25,6 +24,7 @@ export default createStore({
       state.userInfo.name = userInfo.name
       state.userInfo.phone = userInfo.phone
       state.userInfo.account = userInfo.account
+      state.userInfo.id = userInfo.id
     }
   },
   actions: {

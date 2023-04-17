@@ -37,7 +37,7 @@ import { defineComponent, reactive, ref, watch } from 'vue'
 
 export default defineComponent({
     setup(props,ctx) {
-        const formLabelAlign = reactive({
+        let formLabelAlign = reactive({
             name:'',
             phone:'',
             account:'',

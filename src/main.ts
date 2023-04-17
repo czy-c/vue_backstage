@@ -6,7 +6,7 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import { getCookie } from "@/utils/cookie";
 router.beforeEach((to, from, next) => {
-    const token =getCookie("token")||""
+    const token =sessionStorage.getItem(`token_${store.state.userInfo.id}`)||""
     if (token&&store.state.isLogin) {
         if(to.path=='/'){
             next('/main');

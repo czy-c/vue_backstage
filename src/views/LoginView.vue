@@ -51,9 +51,9 @@ export default defineComponent({
         if (res.data.status == "success") {
           console.log(res);
           store.commit("changeLoginStatus", true);
-          setCookie("token", res.data.token);
           router.push({ path: "main" });
           store.commit("getUserInfo", res.data.userInfo);
+          sessionStorage.setItem(`token_${store.state.userInfo.id}`, res.data.token);
         }
         ElMessage({
           message: res.data.message,
