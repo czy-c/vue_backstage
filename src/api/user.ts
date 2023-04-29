@@ -22,3 +22,9 @@ export function register(data:object){
         data
     })
 }
+export function getUserInfo(id:any){
+    return axios({
+        url:'/api/getUserInfo'+`?id=${id}`,
+        method:'get',
+    })
+}

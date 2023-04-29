@@ -11,8 +11,10 @@ export default createStore({
       name:'',
       phone:'',
       account:'',
-      id:''
-    }
+      id:'',
+      avatar:''
+    },
+    token:''
   },
   getters: {
   },
@@ -25,6 +27,10 @@ export default createStore({
       state.userInfo.phone = userInfo.phone
       state.userInfo.account = userInfo.account
       state.userInfo.id = userInfo.id
+      state.userInfo.avatar = userInfo.avatar
+    },
+    setToken(state,token){
+      state.token = token
     }
   },
   actions: {

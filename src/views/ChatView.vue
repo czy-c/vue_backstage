@@ -16,9 +16,10 @@
               </template>
               <div v-for="(o, idx) in friendList" :key="idx" class="text item">
                 <div
-                  :style="{ background: isBgc == idx ? '#ccc' : '' }"
+                  :style="{ background: isBgc == idx ? '#ccc' : '',display:'flex',alignItems:'center' }"
                   @click="addBgc(o, idx)"
                 >
+                <img :src="o.avatar" style="width:25px;border-radius: 50%;padding-right: 10px;" alt="">
                   {{ o.name }}({{ o?.phone }})
                 </div>
               </div>
@@ -34,6 +35,7 @@
                 v-model="input"
                 placeholder="Please input"
                 style="padding-right: 10px"
+                @keyup.enter="sendMessage"
               />
               <el-button type="primary" :disabled="!input" @click="sendMessage"
                 >发送</el-button
@@ -51,6 +53,7 @@ import { ChatMessage } from "@/utils/ChatMessage";
 import { myFriendsList } from "@/api/myFriends";
 import store from "@/store";
 import { getMessage } from "@/api/message";
+import {getUserInfo} from '@/api/user'
 
 export default defineComponent({
   async setup() {
@@ -61,6 +64,7 @@ export default defineComponent({
       name: string;
       phone: string;
       id: number;
+      avatar:string
     };
     let current = reactive({
       name: "",
@@ -71,11 +75,13 @@ export default defineComponent({
         name: "",
         phone: "",
         account: "",
+        avatar:""
       },
     ]);
     // 初始化myFriends列表
     await myFriendsList().then((res) => {
       let userList: Array<T> = res.data;
+      console.log(res)
       let main = userList?.filter(
         (f) => f.account == store.state.userInfo.account
       );
@@ -90,15 +96,34 @@ export default defineComponent({
       friendList.value = userList;
     });
     // 选中用户添加背景色
-    const addBgc = (item: any, idx: number) => {
+    let messageList = ref("");
+    let avatar =ref('')//当前正在聊天的用户头像
+    getUserInfo(toId.value).then(res=>{
+      avatar.value = res.data[0].avatar
+    })
+    const addBgc = async (item: any, idx: number) => {
       current.name = item.name;
       isBgc.value = idx;
       if (idx == 0) isBgc.value = -1;
+      toId.value = item.id;
+      getUserInfo(item.id).then(res=>{
+        console.log(res)
+      avatar.value = res.data[0].avatar
+    })
+      let messages = await getMessage(toId.value, store.state.userInfo.id);
+      // console.log(messages);
+      messages.data = Object.assign(messages.data,{'avatar':avatar.value})
+      messageList.value = ChatMessage(messages.data);
+      setTimeout(() => {
+        document.getElementsByClassName("messageContent")[0].scrollTop =
+          document.getElementsByClassName("messageContent")[0].scrollHeight;
+      }, 1);
+      input.value = ''
     };
     // 获取和当前用户的聊天记录
-    let messageList = ref("");
     let messages = await getMessage(toId.value, store.state.userInfo.id);
-    console.log(messages);
+    // console.log(messages);
+    messages.data = Object.assign(messages.data,{'avatar':avatar.value})
     messageList.value = ChatMessage(messages.data);
     // websocket
     let ws: any;
@@ -108,16 +133,22 @@ export default defineComponent({
       //   console.log("WebSocket connected", event);
     });
     // 接受到服务端返回的消息
-    ws.addEventListener("message", (event: any) => {
+    ws.addEventListener("message", async (event: any) => {
       if (event.data) {
         let a = JSON.parse(event.data);
+        // console.log(event.data);
         messageList.value = ChatMessage(a);
+        let messages = await getMessage(toId.value, store.state.userInfo.id);
+        messageList.value = ChatMessage(messages.data);
         setTimeout(() => {
-                document.getElementsByClassName("messageContent")[0].scrollTop =
-              document.getElementsByClassName("messageContent")[0].scrollHeight;
+          document.getElementsByClassName("messageContent")[0].scrollTop =
+            document.getElementsByClassName("messageContent")[0].scrollHeight;
         }, 1);
       }
     });
+    ws.addEventListener("error",(error:any)=>{
+      console.log(error)
+    })
     // 客户端向服务端返回的消息
     const sendMessage = () => {
       if (input.value) {
@@ -133,8 +164,8 @@ export default defineComponent({
     };
 
     setTimeout(() => {
-        document.getElementsByClassName("messageContent")[0].scrollTop =
-          document.getElementsByClassName("messageContent")[0].scrollHeight;
+      document.getElementsByClassName("messageContent")[0].scrollTop =
+        document.getElementsByClassName("messageContent")[0].scrollHeight;
     }, 1);
 
     return {

@@ -4,12 +4,14 @@
   </suspense>
 </template>
 
+
 <style lang="less">
 body{
   margin: 0;
   padding: 0;
   height: 100vh;
   min-width: 750px;
+  user-select: none;
 }
 *::-webkit-scrollbar {
     width: 5px;

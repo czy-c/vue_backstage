@@ -42,6 +42,7 @@ export default defineComponent({
       password: "",
     });
     const store = useStore();
+    console.log(store.state.isLogin)
     const loginSubmit = () => {
       let data: object = {
         account: formLabelAlign.account,
@@ -53,6 +54,7 @@ export default defineComponent({
           store.commit("changeLoginStatus", true);
           router.push({ path: "main" });
           store.commit("getUserInfo", res.data.userInfo);
+          store.commit("setToken", res.data.token);
           sessionStorage.setItem(`token_${store.state.userInfo.id}`, res.data.token);
         }
         ElMessage({
